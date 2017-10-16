@@ -82,6 +82,20 @@ function xmldb_local_library_upgrade($oldversion) {
     	// Library savepoint reached.
     	upgrade_plugin_savepoint(true, 2017101501, 'local', 'library');
     }
+    if ($oldversion < 2017101502) {
+    
+    	 // Define field stock to be added to local_library_book.
+        $table = new xmldb_table('local_library_book');
+        $field = new xmldb_field('stock', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '1', 'tagtwo');
+
+        // Conditionally launch add field stock.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    
+    	// Library savepoint reached.
+    	upgrade_plugin_savepoint(true, 2017101502, 'local', 'library');
+    }
     
     
     return true;

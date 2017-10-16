@@ -30,12 +30,11 @@ require_once ($CFG->dirroot.'/local/library/locallib.php');
 
 global $DB, $USER, $CFG;
 
-$bookid = optional_param("bookid",0, PARAM_INT);
-$reservation = optional_param("reserva", false, PARAM_BOOL);
+$bookid = required_param('id', PARAM_INT);
 
 require_login();
 
-$baseurl = new moodle_url ( '/local/library/library.php' );
+$baseurl = new moodle_url ( '/local/library/reserve.php' );
 $context = context_system::instance ();
 $PAGE->set_context ( $context );
 $PAGE->set_url ( $baseurl );
@@ -44,31 +43,21 @@ $PAGE->set_title ( "Library" );
 $PAGE->set_heading ( "Virtual Library" );
 $PAGE->navbar->add ( "Library", 'library.php' );
 echo $OUTPUT->header ();
+echo $OUTPUT->heading ( "Reserve your book" );
 
-if($reservation=1 && $bookid!= 0){
-	$date = strtotime(date("d-m-Y"));
-	$insert=new stdClass();
-	$insert -> userid = $USER->id;
-	$insert -> bookid = $bookid;
-	$insert -> date = $date;
-	$DB->insert_record("local_library", $insert, FALSE);
-	$book = $DB->get_record("local_library_book", array("id"=>$bookid));
-	$newstock = $book->stock -1;
-	$update = new stdClass();
-	$update->id = $bookid;
-	$update->stock = $newstock;
-	$DB->update_record("local_library_book", $update);
-	echo"todo ok!";die();
-}
+$book = $DB->get_record('local_library_book', array('id'=>$bookid));
 
-echo $OUTPUT->heading ( "Choose your book" );
+echo "Quieres reservar: <br><br><h4>".$book->name."</h4><br> 
+		La reserva es valida por 3 dias habiles, por favor, despues de hacer click en el boton 
+		reservar de abajo, dirigete a biblioteca para retirar tu copia.<br><br>";
 
+$url_accept = new moodle_url("library.php",array('bookid'=>$book->id, 'reserva'=>true));
 
-$table = library_bookshelf();
+$url_cancel = new moodle_url("library.php",array('bookid'=>$book->id, 'reserva'=>false));
 
-$print_table = html_writer:: table($table);
+$print = "<br>";
+$print .= $OUTPUT->single_button($url_cancel,"Cancelar")."			".$OUTPUT->single_button($url_accept,"Reservar");
 
-echo $print_table;
+echo $print;
 
 echo $OUTPUT->footer ();
-die("fin de la hoja");
