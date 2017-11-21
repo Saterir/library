@@ -27,16 +27,15 @@
 
 require_once (dirname ( __FILE__ ) . '/../../config.php');
 require_once ($CFG->dirroot.'/local/library/locallib.php');
-require_once ($CFG->dirroot.'/local/library/forms.php');
 
 global $DB, $USER, $CFG;
 
-$bookid = optional_param("bookid",0, PARAM_INT);
-$reservation = optional_param("reserva", false, PARAM_BOOL);
+$bookid = required_param('id', PARAM_INT);
 
 require_login();
 
-$baseurl = new moodle_url ( '/local/library/library.php' );
+
+$baseurl = new moodle_url ( '/local/library/reserve.php' );
 $context = context_system::instance ();
 $PAGE->set_context ( $context );
 $PAGE->set_url ( $baseurl );
@@ -45,32 +44,27 @@ $PAGE->set_title ( "Library" );
 $PAGE->set_heading ( "Virtual Library" );
 $PAGE->navbar->add ( "Library", 'library.php' );
 echo $OUTPUT->header ();
+echo $OUTPUT->heading ( "Devolucion de libros" );
 
-$form_buscar = new formBuscarLibro ( null );
-echo $form_buscar->display ();
-if($fromform = $form_buscar->get_data ()){
-	echo $OUTPUT->heading ( "Resultados de la Busqueda" );
-	//Get books ids matching the form inputs 
-	$booksid = library_get_books_fromform($fromform);
-	//Var_dump($booksid);die();
-	$shelf = library_filtered_bookshelf($booksid);
-	$print_table = html_writer:: table($shelf);
-	echo $print_table;
-	
-	echo $OUTPUT->footer ();
-	die();
+if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
+
+$book = $DB->get_record('local_library_book', array('id'=>$bookid));
+
+echo "Quieres Devolver: <br><br><h4>".$book->name."</h4><br>
+		¿Estas Seguro/a que es lo que deseas?.<br><br>";
+
+$url_accept = new moodle_url("giveback.php",array('bookid'=>$book->id));
+
+$url_cancel = new moodle_url("giveback.php",array('bookid'=>$book->id));
+
+$print = "<br>";
+$print .= $OUTPUT->single_button($url_cancel,"Cancelar")."			".$OUTPUT->single_button($url_accept,"Devolver");
+
+echo $print;
+
+echo $OUTPUT->footer ();
 }else{
-	//Validate there is not previous reservation
-	echo library_reservation_validation($reservation, $bookid);
-
-	echo $OUTPUT->heading ( "Choose your book" );
-
-
-	$table = library_bookshelf();
-
-	$print_table = html_writer:: table($table);
-
-	echo $print_table;
 	echo $OUTPUT->footer ();
 	die();
+	
 }

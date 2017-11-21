@@ -31,46 +31,43 @@ require_once ($CFG->dirroot.'/local/library/forms.php');
 
 global $DB, $USER, $CFG;
 
-$bookid = optional_param("bookid",0, PARAM_INT);
-$reservation = optional_param("reserva", false, PARAM_BOOL);
-
 require_login();
 
-$baseurl = new moodle_url ( '/local/library/library.php' );
+$baseurl = new moodle_url ( '/local/library/librarian.php' );
 $context = context_system::instance ();
 $PAGE->set_context ( $context );
 $PAGE->set_url ( $baseurl );
 $PAGE->set_pagelayout ( 'standard' );
 $PAGE->set_title ( "Library" );
 $PAGE->set_heading ( "Virtual Library" );
-$PAGE->navbar->add ( "Library", 'library.php' );
+$PAGE->navbar->add ( "Librarian", 'librarian.php' );
 echo $OUTPUT->header ();
 
-$form_buscar = new formBuscarLibro ( null );
-echo $form_buscar->display ();
-if($fromform = $form_buscar->get_data ()){
-	echo $OUTPUT->heading ( "Resultados de la Busqueda" );
-	//Get books ids matching the form inputs 
-	$booksid = library_get_books_fromform($fromform);
-	//Var_dump($booksid);die();
-	$shelf = library_filtered_bookshelf($booksid);
-	$print_table = html_writer:: table($shelf);
-	echo $print_table;
-	
-	echo $OUTPUT->footer ();
-	die();
+echo $OUTPUT->heading ( "Elige una Opcion" );
+
+if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
+//if(require_capability("local/library:Librarian", $context->id)){
+$table = new html_table();
+
+$buttons = [];
+
+$urlNewBook = new moodle_url("newbook.php");
+$buttonNewBook = $OUTPUT->single_button($urlNewBook,"Crear nuevo Libro");
+$buttons[1] = $buttonNewBook;
+
+$urlGiveBackBook = new moodle_url("giveback.php");
+$buttonGiveBackBook = $OUTPUT->single_button($urlGiveBackBook,"Devolver Libro");
+$buttons[2] = $buttonGiveBackBook;
+$table->data[]=$buttons;
+$print_table = html_writer:: table($table);
+
+echo $print_table;
+
+
+echo $OUTPUT-> footer();
+die();
 }else{
-	//Validate there is not previous reservation
-	echo library_reservation_validation($reservation, $bookid);
-
-	echo $OUTPUT->heading ( "Choose your book" );
-
-
-	$table = library_bookshelf();
-
-	$print_table = html_writer:: table($table);
-
-	echo $print_table;
-	echo $OUTPUT->footer ();
+	echo "<h3> No tienes permiso para ver esta pagina";
+	echo $OUTPUT-> footer();
 	die();
 }

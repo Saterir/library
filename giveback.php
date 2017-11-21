@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,14 +17,14 @@
 
 /**
  * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
- *
- * @package    newmodule
- * @copyright  2016 Your Name <your@email.address>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*
+* Setting the $plugin->version to 0 prevents the plugin from being installed.
+* See https://docs.moodle.org/dev/version.php for more info.
+*
+* @package    newmodule
+* @copyright  2016 Your Name <your@email.address>
+* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 
 require_once (dirname ( __FILE__ ) . '/../../config.php');
 require_once ($CFG->dirroot.'/local/library/locallib.php');
@@ -31,28 +32,33 @@ require_once ($CFG->dirroot.'/local/library/forms.php');
 
 global $DB, $USER, $CFG;
 
-$bookid = optional_param("bookid",0, PARAM_INT);
-$reservation = optional_param("reserva", false, PARAM_BOOL);
-
 require_login();
 
-$baseurl = new moodle_url ( '/local/library/library.php' );
+$bookid = optional_param("bookid",0, PARAM_INT);
+
+$baseurl = new moodle_url ( '/local/library/librarian.php' );
 $context = context_system::instance ();
 $PAGE->set_context ( $context );
 $PAGE->set_url ( $baseurl );
 $PAGE->set_pagelayout ( 'standard' );
 $PAGE->set_title ( "Library" );
 $PAGE->set_heading ( "Virtual Library" );
-$PAGE->navbar->add ( "Library", 'library.php' );
+$PAGE->navbar->add ( "Librarian", 'librarian.php' );
 echo $OUTPUT->header ();
+
+echo $OUTPUT->heading ( "Devolver un Libro" );
+if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
+
+
 
 $form_buscar = new formBuscarLibro ( null );
 echo $form_buscar->display ();
 if($fromform = $form_buscar->get_data ()){
+	
 	echo $OUTPUT->heading ( "Resultados de la Busqueda" );
-	//Get books ids matching the form inputs 
+	//Get books ids matching the form inputs
 	$booksid = library_get_books_fromform($fromform);
-	//Var_dump($booksid);die();
+	
 	$shelf = library_filtered_bookshelf($booksid);
 	$print_table = html_writer:: table($shelf);
 	echo $print_table;
@@ -61,12 +67,12 @@ if($fromform = $form_buscar->get_data ()){
 	die();
 }else{
 	//Validate there is not previous reservation
-	echo library_reservation_validation($reservation, $bookid);
+	echo library_giveback_validation($bookid);
 
 	echo $OUTPUT->heading ( "Choose your book" );
 
 
-	$table = library_bookshelf();
+	$table = library_giveback_bookshelf();
 
 	$print_table = html_writer:: table($table);
 
@@ -74,3 +80,7 @@ if($fromform = $form_buscar->get_data ()){
 	echo $OUTPUT->footer ();
 	die();
 }
+}else{
+	echo $OUTPUT->footer ();
+	die();
+}	
