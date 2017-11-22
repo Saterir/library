@@ -25,16 +25,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-
-    'local/library:Librarian' => array(
-        'captype'      => 'read',
-    	'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes'   => array(
-        		'manager' => CAP_ALLOW
-        ),
-
-        'clonepermissionsfrom' => 'moodle/my:manageblocks'
-    ),
+	
+	'local/library:Librarian' => array(
+		'captype'      => 'read',
+		'contextlevel' => CONTEXT_SYSTEM,
+		'archetypes'   => array(
+			'manager' => CAP_ALLOW
+		),
+				
+		'clonepermissionsfrom' => 'moodle/my:manageblocks'
+		),
 
     'local/library:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,

@@ -45,7 +45,7 @@ echo $OUTPUT->header ();
 
 echo $OUTPUT->heading ( "Elige una Opcion" );
 
-if(has_capability("local/library:Librarian",context_system::instance())){
+if(has_capability("local/library:Librarian",$context)){
 //if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
 	//context_system::instance()
 //$context = context_course::instance($COURSE->id);
