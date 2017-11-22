@@ -29,7 +29,7 @@ require_once (dirname ( __FILE__ ) . '/../../config.php');
 require_once ($CFG->dirroot.'/local/library/locallib.php');
 require_once ($CFG->dirroot.'/local/library/forms.php');
 
-global $DB, $USER, $CFG;
+global $DB, $USER, $CFG, $COURSE;
 
 require_login();
 
@@ -45,7 +45,12 @@ echo $OUTPUT->header ();
 
 echo $OUTPUT->heading ( "Elige una Opcion" );
 
-if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
+if(has_capability("local/library:Librarian",context_system::instance())){
+//if(has_capability("local/library:Librarian",context_user::instance($USER->id))){
+	//context_system::instance()
+//$context = context_course::instance($COURSE->id);
+//if(has_capability("local/library:Librarian",$context)){
+//get_context_instance(CONTEXT_BLOCK, $this->instance->id)
 //if(require_capability("local/library:Librarian", $context->id)){
 $table = new html_table();
 
